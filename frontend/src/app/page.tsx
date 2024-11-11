@@ -133,13 +133,15 @@ export default function Home() {
                 bg={issue.status === "Resolved" ? "gray.700" : "black"} // Conditional background color
               >
                 <Card.Header p={2}>
-                  <Heading as="h2" size="md" mb={2}>
+                  <Heading as="h2" size="md" mb={2} color="white">
                     {issue.title}
                   </Heading>
                 </Card.Header>
 
                 <Card.Body p={2}>
-                  <Text mb={4}>{issue.description}</Text>
+                  <Text mb={4} color="gray">
+                    {issue.description}
+                  </Text>
                   <Box
                     display="flex"
                     alignItems="center"
@@ -168,14 +170,14 @@ export default function Home() {
                   <HStack gap={4}>
                     <Button
                       width={100}
-                      colorScheme="red"
+                      colorPalette="red"
                       variant="outline"
                       onClick={() => deleteIssue(issue.id)}
                     >
                       Delete
                     </Button>
                     <DialogTrigger asChild>
-                      <Button width={100} colorScheme="blue" variant="solid">
+                      <Button width={100} colorPalette="blue" variant="solid">
                         Update
                       </Button>
                     </DialogTrigger>
