@@ -7,7 +7,7 @@ import { Issue } from './interface';
 export class IssueService {
   constructor() {}
 
-  private issueList = [];
+  private issueList = []; // to account for non-persistent data we are using stack storage
 
   createIssue(dto: CreateIssueDto): Issue {
     const newIssue: Issue = {

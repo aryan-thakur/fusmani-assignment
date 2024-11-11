@@ -23,13 +23,14 @@ export function CreateIssueModal({ refreshFunction }: CreateIssueModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Low"); // Default priority
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // Handle form submission
+  /* Function to create a new issue */
   const handleSubmit = async () => {
     const issueData = { title, description, priority };
 
     try {
-      const response = await fetch("http://localhost:3333/issue", {
+      const response = await fetch(baseUrl + "", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

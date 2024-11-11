@@ -1,3 +1,5 @@
+/* Data Transfer Object Representations */
+
 import {
   IsNotEmpty,
   IsString,

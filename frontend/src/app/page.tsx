@@ -26,7 +26,9 @@ import {
 } from "@chakra-ui/react";
 import { CreateIssueModal } from "@/components/CreateIssueModal";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { base } from "framer-motion/client";
 
+/* Contract between the backend and frontend */
 interface Issue {
   id: string;
   title: string;
@@ -43,19 +45,23 @@ export default function Home() {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Low");
   const [status, setStatus] = useState("Open");
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
+  /* Function to fetch the current issue list */
   const fetchIssues = async () => {
     try {
-      const response = await fetch("http://localhost:3333/issue/getAll");
+      const response = await fetch(baseUrl + "/getAll");
       const data = await response.json();
       setIssues(data);
     } catch (error) {
       console.error("Failed to fetch issues:", error);
     }
   };
+
+  /* Function to delete a single issue by id */
   const deleteIssue = async (id: string) => {
     try {
-      const response = await fetch("http://localhost:3333/issue", {
+      const response = await fetch(baseUrl + "", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -72,10 +78,12 @@ export default function Home() {
       console.error("Error deleting issue:", error);
     }
   };
+
+  /* Function to update issue by id */
   const updateIssue = async (id: string) => {
     const issueData = { id, title, description, priority, status };
     try {
-      const response = await fetch("http://localhost:3333/issue", {
+      const response = await fetch(baseUrl + "", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -89,6 +97,8 @@ export default function Home() {
       console.error("Error creating issue:", error);
     }
   };
+
+  /* On mount*/
   useEffect(() => {
     fetchIssues();
   }, []); // Empty dependency array means this only runs once on component mount
