@@ -1,95 +1,245 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  Box,
+  Heading,
+  Highlight,
+  Text,
+  Stack,
+  Badge,
+  Flex,
+  Button,
+  HStack,
+  Card,
+  DialogRoot,
+  DialogTrigger,
+  DialogContent,
+  DialogActionTrigger,
+  DialogBody,
+  DialogCloseTrigger,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  VStack,
+} from "@chakra-ui/react";
+import { CreateIssueModal } from "@/components/CreateIssueModal";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+
+interface Issue {
+  id: string;
+  title: string;
+  description: string;
+  status: "Open" | "In Progress" | "Resolved";
+  priority: "Low" | "Medium" | "High";
+  createdDate: Date;
+  updatedDate: Date;
+}
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("Low");
+  const [status, setStatus] = useState("Open");
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const fetchIssues = async () => {
+    try {
+      const response = await fetch("http://localhost:3333/issue/getAll");
+      const data = await response.json();
+      setIssues(data);
+    } catch (error) {
+      console.error("Failed to fetch issues:", error);
+    }
+  };
+  const deleteIssue = async (id: string) => {
+    try {
+      const response = await fetch("http://localhost:3333/issue", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (response.ok) {
+        fetchIssues();
+      } else {
+        console.error(response);
+      }
+    } catch (error) {
+      console.error("Error deleting issue:", error);
+    }
+  };
+  const updateIssue = async (id: string) => {
+    const issueData = { id, title, description, priority, status };
+    try {
+      const response = await fetch("http://localhost:3333/issue", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(issueData),
+      });
+      const data = await response.json();
+      console.log("Issue updated:", data);
+      fetchIssues();
+    } catch (error) {
+      console.error("Error creating issue:", error);
+    }
+  };
+  useEffect(() => {
+    fetchIssues();
+  }, []); // Empty dependency array means this only runs once on component mount
+
+  return (
+    <Box>
+      <Flex alignItems="center" justifyContent="center">
+        <Box>
+          <Heading size="5xl" color="#64748B">
+            <Highlight query="List" styles={{ color: "teal.600" }}>
+              IssueList
+            </Highlight>
+          </Heading>
+        </Box>
+      </Flex>
+      <Box p={6} margin="20px" border="4px solid #64748B" borderRadius="10px">
+        <Stack gap={6} p={6}>
+          {issues.map((issue) => (
+            <DialogRoot
+              key={issue.id}
+              size="cover"
+              role="alertdialog"
+              placement="center"
+              motionPreset="slide-in-bottom"
+            >
+              <Card.Root
+                borderWidth="1px"
+                borderRadius="lg"
+                boxShadow="md"
+                p={4}
+                m={2}
+              >
+                <Card.Header p={2}>
+                  <Heading as="h2" size="md" mb={2}>
+                    {issue.title}
+                  </Heading>
+                </Card.Header>
+
+                <Card.Body p={2}>
+                  <Text mb={4}>{issue.description}</Text>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="left"
+                    mb={4}
+                  >
+                    <Badge colorPalette="green" px={2} py={1} mr={4}>
+                      {issue.priority}
+                    </Badge>
+                    <Badge colorPalette="blue" px={2} py={1} ml={2}>
+                      {issue.status}
+                    </Badge>
+                  </Box>
+                  <Text fontSize="sm" color="gray.500" mb={1}>
+                    Created: {new Date(issue.createdDate).toLocaleDateString()}
+                  </Text>
+                  <Text fontSize="sm" color="gray.500">
+                    Last Updated:{" "}
+                    {new Date(issue.updatedDate).toLocaleDateString()}
+                  </Text>
+                </Card.Body>
+
+                <Card.Footer p={2} mt={4}>
+                  {" "}
+                  {/* Padding and margin top for spacing */}
+                  <HStack gap={4}>
+                    <Button
+                      width={100}
+                      colorScheme="red"
+                      variant="outline"
+                      onClick={() => deleteIssue(issue.id)}
+                    >
+                      Delete
+                    </Button>
+                    <DialogTrigger asChild>
+                      <Button width={100} colorScheme="blue" variant="solid">
+                        Update
+                      </Button>
+                    </DialogTrigger>
+                  </HStack>
+                </Card.Footer>
+              </Card.Root>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle px="15px" py="15px">
+                    Update issue
+                  </DialogTitle>
+                </DialogHeader>
+                <DialogBody padding="25px">
+                  <VStack align="start">
+                    <p>Title</p>
+                    <Input
+                      placeholder={issue.title}
+                      padding="5px"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                    ></Input>
+                    <p>Description</p>
+                    <Input
+                      padding="5px"
+                      placeholder={issue.description}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    ></Input>
+                    <p>Priority</p>
+                    <SegmentedControl
+                      value={priority}
+                      onValueChange={(e) => setPriority(e.value)}
+                      size="lg"
+                      defaultValue={issue.priority}
+                      items={["High", "Medium", "Low"]}
+                      justifyContent="space-around"
+                      width="40%"
+                    ></SegmentedControl>
+                    <p>Status</p>
+                    <SegmentedControl
+                      value={status}
+                      onValueChange={(e) => setStatus(e.value)}
+                      size="lg"
+                      defaultValue={issue.status}
+                      items={["Open", "In Progress", "Resolved"]}
+                      justifyContent="space-around"
+                      width="40%"
+                    ></SegmentedControl>
+                  </VStack>
+                </DialogBody>
+                <DialogFooter px="15px" py="15px">
+                  <DialogActionTrigger asChild>
+                    <Button variant="outline" padding="10px">
+                      Cancel
+                    </Button>
+                  </DialogActionTrigger>
+                  <DialogActionTrigger asChild>
+                    <Button
+                      onClick={() => {
+                        updateIssue(issue.id);
+                      }}
+                      padding="10px"
+                      colorPalette="green"
+                    >
+                      Submit
+                    </Button>
+                  </DialogActionTrigger>
+                </DialogFooter>
+                <DialogCloseTrigger />
+              </DialogContent>
+            </DialogRoot>
+          ))}
+        </Stack>
+      </Box>
+      <CreateIssueModal refreshFunction={fetchIssues}></CreateIssueModal>
+    </Box>
   );
 }

@@ -16,8 +16,8 @@ export class IssueController {
   }
 
   @Get()
-  getIssue(@Body() id: string) {
-    return this.issueService.getIssue(id);
+  getIssue(@Body() id) {
+    return this.issueService.getIssue(id.id);
   }
 
   @Get('getAll')
@@ -26,8 +26,8 @@ export class IssueController {
   }
 
   @Delete()
-  deleteIssue(@Body() id: string) {
-    return this.issueService.deleteIssue(id);
+  deleteIssue(@Body() id) {
+    return this.issueService.deleteIssue(id.id);
   }
 
   @Patch()

@@ -5,6 +5,8 @@ import {
   IsOptional,
   IsUUID,
 } from 'class-validator';
+import { Priority } from '../pri-enum';
+import { Status } from '../stat-enum';
 
 export class CreateIssueDto {
   @IsNotEmpty()
@@ -15,8 +17,10 @@ export class CreateIssueDto {
   @IsNotEmpty()
   description: string;
 
-  @IsEnum(['Low', 'Medium', 'High'])
-  priority: 'Low' | 'Medium' | 'High';
+  @IsEnum(Priority, {
+    message: 'priority must be one of the following values: Low, Medium, High',
+  })
+  priority: Priority;
 }
 
 export class UpdateIssueDto {
@@ -31,11 +35,13 @@ export class UpdateIssueDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(['Open', 'In Progress', 'Resolved'])
+  @IsEnum(Status, { message: 'Status must be: In Progress, Open or Resolved' })
   @IsOptional()
-  status?: 'Open' | 'In Progress' | 'Resolved';
+  status?: Status;
 
-  @IsEnum(['Low', 'Medium', 'High'])
+  @IsEnum(Priority, {
+    message: 'priority must be one of the following values: Low, Medium, High',
+  })
   @IsOptional()
-  priority?: 'Low' | 'Medium' | 'High';
+  priority?: Priority;
 }
