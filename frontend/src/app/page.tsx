@@ -130,6 +130,7 @@ export default function Home() {
                 boxShadow="md"
                 p={4}
                 m={2}
+                bg={issue.status === "Resolved" ? "gray.700" : "black"} // Conditional background color
               >
                 <Card.Header p={2}>
                   <Heading as="h2" size="md" mb={2}>
